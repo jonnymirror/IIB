@@ -1,5 +1,6 @@
 #include <iostream>
 #include <vector>
+#include <algorithm>
 #include <intrin.h>
 #include <fstream>
 #include <string>
@@ -17,7 +18,10 @@ long long int l;//パラメータ(免疫を持たせる頂点の数の最大値)
 vector<long long int> T;//関数
 long long int x = 5;//ハッシュ値の計算に用いるhash-multiplier
 long long int mod;//ハッシュ値の計算に用いるmod(頂点数によって変化する)
+long long int a=5;//modの計算に用いる定数
 vector<long long int> Monomials;//ハッシュ値の計算に用いる単項式(Monomials[i]はx^iを表す)
+vector<long long int> Hash_table;//polynominal_hash_functionで求めたハッシュ値(それぞれの頂点の近傍に対する)を格納する表
+vector<long long int> Place_of_vertices;//頂点iが属するタイプパーティションを表す配列,Place_of_vertices[i]=-1の時はその頂点はまだどのタイプパーティションにも属していないことを表す,Place_of_vertices[i]=jの時は頂点iがタイプパーティションjに属していることを表す
 //定数終了
 //最終的に感染する頂点を求める関数
 long long int who_is_influenced(long long int bit) {
@@ -48,11 +52,59 @@ void calculate_Monomials() {
 		count = (count*x)%mod;
 	}
 }
+
 //polynominal hash function(それぞれの頂点の近傍に対するハッシュ値を求める)
+void polynominal_hash_fanction() {
+	for (long long int i = 0; i < n; i++) {
+		long long int sum = 0;
+		for (long long int j = 0; j < G[i].size(); j++) {
+			sum = (sum + Monomials[G[i][j]]) % mod;
+		}
+		Hash_table.push_back(sum);
+	}
+}
 
+//近傍多様性を求める
+long long int calculate_neighborhood_diversity() {
+	calculate_Monomials();
+	polynominal_hash_fanction();
+	long long int count = 0;//新しいタイプの頂点はtype_partition[count]に属する
+	for (long long int v = 0; v < n-1; v++) {
+		for (long long int u = v+1; u < n; u++) {
+			long long int one = Hash_table[u] - Monomials[v];//h(N(u)\v)
+			long long int the_other = Hash_table[v] - Monomials[u];//h(N(v)\u)
+			if (one < 0)one += mod;
+			if (the_other < 0)the_other += mod;
+			one = one % mod;
+			the_other = the_other % mod;
+			if (one == the_other) {//h(N(u)\v)==h(N(v)\u)の時
+				if (Place_of_vertices[u] == -1) {//頂点uがどのタイプパーティションにも属していない時
+					Place_of_vertices[u] = count;
+					count++;
+				}
+				Place_of_vertices[v] = Place_of_vertices[u];//vはuと同じタイプパーティションに属する
+			}
+		}
+	}
+}
 
+//近傍多様性が合っているかどうか確認する
+bool check_neighborhood_diversity() {
+	long long int count = 0;//今調べたいタイプパーティションを表す
+	long long int representative = -1;//今調べたいタイプパーティションに属する代表点
+	long long int others = -1;//今調べたいタイプパーティションに属する代表点以外の頂点
+	for (long long int i = 0; i < n; i++) {
+		if (representative == -1 && Place_of_vertices[i] == count) {
+			representative = i;
+		}
+		else if(representative != -1 && Place_of_vertices[i] == count) {
+			others = i;
+			//頂点representativeと頂点othersの近傍が一致しているかどうか確認する(グラフの隣接リストが値の小さい順にsortしている前提で前から比較していく)
+
+		}
+	}
+}
 //メイン関数
-
 int main() {
 	//入力開始
 	ifstream ifs("paper_sample.txt");
@@ -104,9 +156,18 @@ int main() {
 			count++;
 		}
 	}
-	mod = n * n;//modは定数×n^2
+	mod =a* n * n;//modは定数×n^2
+
+	for(int i = 0; i < n; i++){
+		Place_of_vertices.push_back(-1);//
+	}
 	//入力終了
 
+	//入力整理開始
+	for (int i = 0; i < n; i++) {
+		sort(G[i].begin(), G[i].end());//グラフの隣接リストを値が小さい順に並べる(近傍多様性が合っているかどうかの確認をする時のために)
+	}
+	//入力整理終了
 	/*入力確認開始
 	cout << "頂点数:" << n << endl;
 	cout << "枝数:" << m << endl;
@@ -123,8 +184,8 @@ int main() {
 		cout << T[i] << endl;
 	}
 	入力確認終了*/
+	
 	/*多項式確認開始
-	calculate_Monomials();
 	for (int i = 0; i < Monomials.size(); i++) {
 		cout << Monomials[i] << endl;
 	}
