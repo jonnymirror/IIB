@@ -96,23 +96,43 @@ void polynominal_hash_fanction() {
 	}
 	//タイプパーティションの作成終了
 }
+//2つの頂点u,vの近傍を比較する関数(グラフの隣接リストが値の小さい順にsortしている前提で前から比較していく)
+	bool check_neighbor(long long int u, long long int v) {
+		long long int count_u = 0;//G[u]の何番目の頂点かを表す
+		long long int count_v = 0;//G[v]の何番目の頂点かを表す
+		while (1) {
+			if (count_u == G[u].size() && count_v == G[v].size())return true;//2つの頂点u,vの近傍に属する頂点が全て同じだったら,trueを返す
+			if (G[u][count_u] == v)count_u++;//uの近傍に属するvは飛ばす
+			if (G[v][count_v] == u)count_v++;//vの近傍に属するuは飛ばす
+			if (G[u][count_u] == G[v][count_v]) {
+				count_u++;
+				count_v++;
+			}
+			else {
+				return false;
+			}
+		}
+}
 
 //近傍多様性が合っているかどうか確認する
 bool check_neighborhood_diversity() {
-	long long int count = 0;//今調べたいタイプパーティションを表す
 	long long int representative = -1;//今調べたいタイプパーティションに属する代表点
 	long long int others = -1;//今調べたいタイプパーティションに属する代表点以外の頂点
-	for (long long int i = 0; i < n; i++) {
-		if (representative == -1 && Place_of_vertices[i] == count) {
-			representative = i;
-		}
-		else if(representative != -1 && Place_of_vertices[i] == count) {
-			others = i;
-			//頂点representativeと頂点othersの近傍が一致しているかどうか確認する(グラフの隣接リストが値の小さい順にsortしている前提で前から比較していく)
-			
+	//頂点representativeと頂点othersの近傍が一致しているかどうか確認する(グラフの隣接リストが値の小さい順にsortしている前提で前から比較していく)
+	for (long long int i = 0; i < Type_partitions.size(); i++) {
+		if (Type_partitions[i].size() == 1)continue;
+		representative = Type_partitions[i][0];//代表点が定まる
+		for (long long int j = 1; j < Type_partitions[i].size(); j++) {
+			others = Type_partitions[i][j];//近傍を比較する頂点が定まる
+			//2つの頂点の近傍の比較を実際に行う
+			if (!check_neighbor(representative, others)) {//もし異なっていたら
+				return false;
+			}
 		}
 	}
+	return true;
 }
+
 //メイン関数
 int main() {
 	//入力開始
