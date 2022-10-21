@@ -22,6 +22,8 @@ long long int a=5;//modの計算に用いる定数
 vector<long long int> Monomials;//ハッシュ値の計算に用いる単項式(Monomials[i]はx^iを表す)
 vector<long long int> Hash_table;//polynominal_hash_functionで求めたハッシュ値(それぞれの頂点の近傍に対する)を格納する表
 vector<long long int> Place_of_vertices;//頂点iが属するタイプパーティションを表す配列,Place_of_vertices[i]=-1の時はその頂点はまだどのタイプパーティションにも属していないことを表す,Place_of_vertices[i]=jの時は頂点iがタイプパーティションjに属していることを表す
+vector<vector<long long int>> Type_partitions;//タイプパーティション
+long long int nd = -1;//グラフの近傍多様性の値を格納する変数
 //定数終了
 //最終的に感染する頂点を求める関数
 long long int who_is_influenced(long long int bit) {
@@ -65,7 +67,7 @@ void polynominal_hash_fanction() {
 }
 
 //近傍多様性を求める
-long long int calculate_neighborhood_diversity() {
+	void calculate_neighborhood_diversity() {
 	calculate_Monomials();
 	polynominal_hash_fanction();
 	long long int count = 0;//新しいタイプの頂点はtype_partition[count]に属する
@@ -86,6 +88,13 @@ long long int calculate_neighborhood_diversity() {
 			}
 		}
 	}
+	nd = count;//countの値は近傍多様性なので,ndにcountの値を格納する
+	//タイプパーティションの作成開始
+	Type_partitions.resize(count);
+	for (long long int i = 0; i < n; i++) {
+		Type_partitions[Place_of_vertices[i]].push_back(i);
+	}
+	//タイプパーティションの作成終了
 }
 
 //近傍多様性が合っているかどうか確認する
@@ -100,7 +109,7 @@ bool check_neighborhood_diversity() {
 		else if(representative != -1 && Place_of_vertices[i] == count) {
 			others = i;
 			//頂点representativeと頂点othersの近傍が一致しているかどうか確認する(グラフの隣接リストが値の小さい順にsortしている前提で前から比較していく)
-
+			
 		}
 	}
 }
