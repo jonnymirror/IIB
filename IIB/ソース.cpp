@@ -159,6 +159,12 @@ void summarize_neighbor_diversity() {
 		//近傍多様性を求めなおす終了
 	}
 }
+
+//IIB_k(G,k,l)//G,k,lはグローバル変数で設定しているので,関数の引数に書いていない
+bool IIB_k() {
+	
+	return false;
+}
 //メイン関数
 int main() {
 	//入力開始
