@@ -138,6 +138,14 @@ void summarize_neighbor_diversity() {
 	calculate_neighborhood_diversity();
 	while (!check_neighborhood_diversity()) {//近傍多様性が正しくなかったら近傍多様性を求めなおす
 		//変数を初期状態に戻す(Monomials,Hash_table,Place_of_vertices,Type_partitions,ndをcalculate_Monomialsを実行する前に戻す)開始
+		nd=-1;
+		Monomials.clear();
+		Monomials.shrink_to_fit();
+		Hash_table.clear();
+		Hash_table.shrink_to_fit();
+		Place_of_vertices.clear();
+		Place_of_vertices.shrink_to_fit();
+
 		//変数を初期状態に戻す終了
 		//近傍多様性を求めなおす開始
 		x++;
