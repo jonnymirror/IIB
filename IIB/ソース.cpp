@@ -68,8 +68,6 @@ void polynominal_hash_fanction() {
 
 //近傍多様性を求める
 	void calculate_neighborhood_diversity() {
-	calculate_Monomials();
-	polynominal_hash_fanction();
 	long long int count = 0;//新しいタイプの頂点はtype_partition[count]に属する
 	for (long long int v = 0; v < n-1; v++) {
 		for (long long int u = v+1; u < n; u++) {
@@ -133,6 +131,23 @@ bool check_neighborhood_diversity() {
 	return true;
 }
 
+//近傍多様性を求めて,確認する,正しい近傍多様性が求まらなかったらxやaを変えて求め直す(近傍多様性に関する関数をまとめたもの)
+void summarize_neighbor_diversity() {
+	calculate_Monomials();
+	polynominal_hash_fanction();
+	calculate_neighborhood_diversity();
+	while (!check_neighborhood_diversity()) {//近傍多様性が正しくなかったら近傍多様性を求めなおす
+		//変数を初期状態に戻す(Monomials,Hash_table,Place_of_vertices,Type_partitions,ndをcalculate_Monomialsを実行する前に戻す)開始
+		//変数を初期状態に戻す終了
+		//近傍多様性を求めなおす開始
+		x++;
+		a++;
+		calculate_Monomials();
+		polynominal_hash_fanction();
+		calculate_neighborhood_diversity();
+		//近傍多様性を求めなおす終了
+	}
+}
 //メイン関数
 int main() {
 	//入力開始
