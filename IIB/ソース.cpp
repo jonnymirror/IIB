@@ -24,6 +24,9 @@ vector<long long int> Hash_table;//polynominal_hash_function‚Å‹‚ß‚½ƒnƒbƒVƒ…’l(‚
 vector<long long int> Place_of_vertices;//’¸“_i‚ª‘®‚·‚éƒ^ƒCƒvƒp[ƒeƒBƒVƒ‡ƒ“‚ğ•\‚·”z—ñ,Place_of_vertices[i]=-1‚Ì‚Í‚»‚Ì’¸“_‚Í‚Ü‚¾‚Ç‚Ìƒ^ƒCƒvƒp[ƒeƒBƒVƒ‡ƒ“‚É‚à‘®‚µ‚Ä‚¢‚È‚¢‚±‚Æ‚ğ•\‚·,Place_of_vertices[i]=j‚Ì‚Í’¸“_i‚ªƒ^ƒCƒvƒp[ƒeƒBƒVƒ‡ƒ“j‚É‘®‚µ‚Ä‚¢‚é‚±‚Æ‚ğ•\‚·
 vector<vector<long long int>> Type_partitions;//ƒ^ƒCƒvƒp[ƒeƒBƒVƒ‡ƒ“
 long long int nd = -1;//ƒOƒ‰ƒt‚Ì‹ß–T‘½—l«‚Ì’l‚ğŠi”[‚·‚é•Ï”
+long long int numbers_of_induced_subgraph_vertices;//—U“±•”•ªƒOƒ‰ƒt‚Ì’¸“_”
+vector<vector<long long int>> Induced_subgraph;//—U“±•”•ªƒOƒ‰ƒt
+vector<long long int> Induced_subgraph_vertices;//—U“±•”•ªƒOƒ‰ƒt‚Ì’¸“_W‡
 //’è”I—¹
 //ÅI“I‚ÉŠ´õ‚·‚é’¸“_‚ğ‹‚ß‚éŠÖ”
 long long int who_is_influenced(long long int bit) {
@@ -159,12 +162,39 @@ void summarize_neighbor_diversity() {
 		//‹ß–T‘½—l«‚ğ‹‚ß‚È‚¨‚·I—¹
 	}
 }
+//IIB_k‚Ì‘Oˆ—(G‚Ìƒ^ƒCƒvƒp[ƒeƒBƒVƒ‡ƒ“{V_0,V_1,...,V_nd}‚Ì‚»‚ê‚¼‚ê‚ÌV_i={v_{i,1},...,v_{i,|V_i|}}‚Ì’¸“_‚ğè‡’l‚Ì”ñŒ¸­‡,—á‚¦‚Î,t(v_{i,j})<=t(v_{i,j+1})),‚Ì‚æ‚¤‚É•À‚×‚é)
+void sort_in_order_of_thresholds() {
+
+}
 
 //IIB_k(G,k,l)//G,k,l‚ÍƒOƒ[ƒoƒ‹•Ï”‚Åİ’è‚µ‚Ä‚¢‚é‚Ì‚Å,ŠÖ”‚Ìˆø”‚É‘‚¢‚Ä‚¢‚È‚¢
 bool IIB_k() {
-	
+	for (long long int f = 1; f < k + 1; f++) {
+		//‘½d‘g‚İ‡‚í‚¹‚Ì—ñ‹“•û–@‚ª•ª‚©‚ç‚ñ
+	}
 	return false;
 }
+
+//—U“±•”•ªƒOƒ‰ƒt‚ğì‚éŠÖ”
+void making_induced_subgraph(long long int induced_subgraph_n) {
+	for (long long int i = 0; i < induced_subgraph_n; i++) {
+		long long int a;
+		cin >> a;
+		a--;
+		Induced_subgraph_vertices.push_back(a);
+	}
+	sort(Induced_subgraph_vertices.begin(), Induced_subgraph_vertices.end());//binary_search‚Ísort‚³‚ê‚Ä‚¢‚évector‚É‘Î‚µ‚Ä‚Ì‚İ³‚µ‚­’Tõ‚Å‚«‚é‚Ì‚Å,‚±‚±‚Åsort‚·‚é
+	Induced_subgraph.resize(n);
+	for (long long int i = 0; i < Induced_subgraph_vertices.size(); i++) {
+		for (long long int j = 0; j < G[Induced_subgraph_vertices[i]].size(); j++) {
+			//i‚ÆG[i][j]‚ª‚Ç‚¿‚ç‚à—U“±•”•ªƒOƒ‰ƒt‚Ì’¸“_W‡‚É‘®‚·‚é‚È‚ç‚Î
+			if (binary_search(Induced_subgraph_vertices.begin(), Induced_subgraph_vertices.end(), G[Induced_subgraph_vertices[i]][j]) && binary_search(Induced_subgraph_vertices.begin(), Induced_subgraph_vertices.end(), Induced_subgraph_vertices[i])) {//O(log(induced_subgraph_vertices.size()))ŠÔ‚©‚©‚é
+				Induced_subgraph[Induced_subgraph_vertices[i]].push_back(G[Induced_subgraph_vertices[i]][j]);
+			};
+		}
+	}
+}
+
 //ƒƒCƒ“ŠÖ”
 int main() {
 	//“ü—ÍŠJn
@@ -253,6 +283,9 @@ int main() {
 	‘½€®Šm”FI—¹*/
 
 	clock_t start = clock();    //ŠÔ‘ª’èŠJn
+
+	cin >> numbers_of_induced_subgraph_vertices;
+	making_induced_subgraph(numbers_of_induced_subgraph_vertices);//•”•ª—U“±ƒOƒ‰ƒt‚Ìì¬
 
 	clock_t end = clock();     // ŠÔ‘ª’èI—¹
 	cout << "duration = " << (double)(end - start) / CLOCKS_PER_SEC << "sec.\n";
