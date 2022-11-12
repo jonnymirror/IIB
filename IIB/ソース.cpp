@@ -26,7 +26,6 @@ vector<vector<long long int>> Type_partitions;//タイプパーティション
 long long int nd = -1;//グラフの近傍多様性の値を格納する変数
 long long int numbers_of_induced_subgraph_vertices;//誘導部分グラフの頂点数
 vector<vector<long long int>> Induced_subgraph;//誘導部分グラフ
-vector<long long int> Induced_subgraph_vertices;//誘導部分グラフの頂点集合
 //定数終了
 //最終的に感染する頂点を求める関数
 long long int who_is_influenced(long long int bit) {
@@ -162,6 +161,31 @@ void summarize_neighbor_diversity() {
 		//近傍多様性を求めなおす終了
 	}
 }
+
+//誘導部分グラフを計算する関数
+void making_induced_subgraph(long long int induced_subgraph_n) {
+	vector<bool> Exist;//誘導部分グラフを計算するのに用いる配列,頂点iが誘導部分グラフの頂点集合に属していたらexist[i]=true,属していなければexist[i]=falseである.
+	Exist.resize(n);
+	for (long long int i = 0; i < n; i++) {
+		Exist[i] = false;
+	}
+	for (long long int i = 0; i < induced_subgraph_n; i++) {
+		long long int a;
+		cin >> a;
+		a--;
+		Exist[a] = true;
+	}
+	Induced_subgraph.resize(n);
+	for (long long int i = 0; i < n; i++) {
+		for (long long int j = 0; j < G[i].size(); j++) {
+			//iとG[i][j]がどちらも誘導部分グラフの頂点集合に属するならば
+			if (Exist[i] && Exist[G[i][j]]) {
+				Induced_subgraph[i].push_back(G[i][j]);
+			};//
+		}
+	}
+}
+
 //IIB_kの前処理(Gのタイプパーティション{V_0,V_1,...,V_nd}のそれぞれのV_i={v_{i,1},...,v_{i,|V_i|}}の頂点を閾値の非減少順,例えば,t(v_{i,j})<=t(v_{i,j+1})),のように並べる)
 void sort_in_order_of_thresholds() {
 
@@ -173,26 +197,6 @@ bool IIB_k() {
 		//多重組み合わせの列挙方法が分からん
 	}
 	return false;
-}
-
-//誘導部分グラフを作る関数
-void making_induced_subgraph(long long int induced_subgraph_n) {
-	for (long long int i = 0; i < induced_subgraph_n; i++) {
-		long long int a;
-		cin >> a;
-		a--;
-		Induced_subgraph_vertices.push_back(a);
-	}
-	sort(Induced_subgraph_vertices.begin(), Induced_subgraph_vertices.end());//binary_searchはsortされているvectorに対してのみ正しく探索できるので,ここでsortする
-	Induced_subgraph.resize(n);
-	for (long long int i = 0; i < Induced_subgraph_vertices.size(); i++) {
-		for (long long int j = 0; j < G[Induced_subgraph_vertices[i]].size(); j++) {
-			//iとG[i][j]がどちらも誘導部分グラフの頂点集合に属するならば
-			if (binary_search(Induced_subgraph_vertices.begin(), Induced_subgraph_vertices.end(), G[Induced_subgraph_vertices[i]][j]) && binary_search(Induced_subgraph_vertices.begin(), Induced_subgraph_vertices.end(), Induced_subgraph_vertices[i])) {//O(log(induced_subgraph_vertices.size()))時間かかる
-				Induced_subgraph[Induced_subgraph_vertices[i]].push_back(G[Induced_subgraph_vertices[i]][j]);
-			};
-		}
-	}
 }
 
 //メイン関数
