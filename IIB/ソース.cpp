@@ -163,14 +163,16 @@ void summarize_neighbor_diversity() {
 }
 
 //誘導部分グラフを計算する関数
-void making_induced_subgraph(long long int induced_subgraph_n) {
+vector<bool> making_induced_subgraph(long long int induced_subgraph_n) {
 	vector<bool> Exist;//誘導部分グラフを計算するのに用いる配列,頂点iが誘導部分グラフの頂点集合に属していたらexist[i]=true,属していなければexist[i]=falseである.
 	Exist.resize(n);
+	cout << "Existの大きさは" << Exist.size() << endl;
 	for (long long int i = 0; i < n; i++) {
 		Exist[i] = false;
 	}
 	for (long long int i = 0; i < induced_subgraph_n; i++) {
 		long long int a;
+		cout << i + 1 << "つ目の頂点を入力してください:" << endl;
 		cin >> a;
 		a--;
 		Exist[a] = true;
@@ -184,6 +186,59 @@ void making_induced_subgraph(long long int induced_subgraph_n) {
 			};//
 		}
 	}
+	return Exist;
+}
+
+//最終的に感染する頂点を求める関数(bitを使わない実装)
+vector<bool> who_is_influenced_not_bit(vector<bool> Exist) {
+	vector<bool> Influenced;//頂点iが感染していたらinfluenced[i]=true,そうでなければinfluenced[i]=falseである
+	Influenced.resize(n);
+	for (long long int i = 0; i < n; i++) {
+		Influenced[i] = false;
+	}
+	//1回目の拡散過程の実装開始
+	for (long long int i = 0; i < n; i++) {
+		if (Exist[i] && T[i] == 0)Influenced[i] = true;
+	}
+	//1回目の拡散過程の実装終了
+	//t回目の拡散過程の実装開始
+	bool changed = false;
+	do {
+		changed = false;
+		for (long long int i = 0; i < n; i++) {
+			long long int count = 0;//頂点uの隣接点で感染している頂点の数を数える
+			if (Exist[i] && !Influenced[i]) {
+				for (long long int j = 0; j < Induced_subgraph[i].size(); j++) {
+					if (Influenced[Induced_subgraph[i][j]])count++;
+				}
+				if (count >= T[i]) {
+					Influenced[i] = true;
+					changed = true;
+				}
+			}
+		}
+	} while (changed);
+	//t回目の拡散過程の実装終了
+	return Influenced;
+}
+
+//|Y(X)|を求める関数
+vector<bool> calculate_YX(vector<bool> Influenced, vector<bool> Exist) {
+	vector<bool> YX;//頂点iがY(X)に属するならYX[i]=1,属さないならYX[i]=0
+	YX.resize(n);
+	for (long long int i = 0; i < n; i++) {
+		YX[i] = false;
+	}
+	for (long long int i = 0; i < n; i++) {
+		if (!Exist[i]) {
+			long long int count = 0;
+			for (long long int j = 0; j < G[i].size(); j++) {
+				if (Influenced[G[i][j]])count++;
+			}
+			if (count >= T[i])YX[i] = true;
+		}
+	}
+	return YX;
 }
 
 //IIB_kの前処理(Gのタイプパーティション{V_0,V_1,...,V_nd}のそれぞれのV_i={v_{i,1},...,v_{i,|V_i|}}の頂点を閾値の非減少順,例えば,t(v_{i,j})<=t(v_{i,j+1})),のように並べる)
@@ -191,10 +246,29 @@ void sort_in_order_of_thresholds() {
 
 }
 
+//重複組み合わせ列挙
+vector<long long int> A;
+void overlapping_combination(long long int s, long long int t) {
+	if (s == nd && t == 0) {
+		for (long long int i = 0; i < A.size(); i++) {
+			cout << A[i] << " ";
+		}
+		cout << endl;
+		return;
+	}
+	if (s == nd && t != 0) {
+		return;
+	}
+	for (long long int i = 0; i <= t; i++) {
+		A[s] = i;
+		overlapping_combination(s + 1, t - i);
+	}
+}
+
 //IIB_k(G,k,l)//G,k,lはグローバル変数で設定しているので,関数の引数に書いていない
 bool IIB_k() {
 	for (long long int f = 1; f < k + 1; f++) {
-		//多重組み合わせの列挙方法が分からん
+		
 	}
 	return false;
 }
