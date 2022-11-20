@@ -163,6 +163,7 @@ void summarize_neighbor_diversity() {
 }
 
 //誘導部分グラフを計算する関数
+//修正必要そう(誘導部分グラフの頂点集合を自動で入力するようにする)
 vector<bool> making_induced_subgraph(long long int induced_subgraph_n) {
 	vector<bool> Exist;//誘導部分グラフを計算するのに用いる配列,頂点iが誘導部分グラフの頂点集合に属していたらexist[i]=true,属していなければexist[i]=falseである.
 	Exist.resize(n);
@@ -243,7 +244,9 @@ vector<bool> calculate_YX(vector<bool> Influenced, vector<bool> Exist) {
 
 //IIB_kの前処理(Gのタイプパーティション{V_0,V_1,...,V_nd}のそれぞれのV_i={v_{i,1},...,v_{i,|V_i|}}の頂点を閾値の非減少順,例えば,t(v_{i,j})<=t(v_{i,j+1})),のように並べる)
 void sort_in_order_of_thresholds() {
-
+	for (long long int i = 0; i < Type_partitions.size(); i++) {
+		sort(Type_partitions[i].begin(), Type_partitions[i].end());
+	}
 }
 
 //重複組み合わせ列挙
