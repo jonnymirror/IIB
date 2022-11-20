@@ -163,20 +163,15 @@ void summarize_neighbor_diversity() {
 }
 
 //誘導部分グラフを計算する関数
-//修正必要そう(誘導部分グラフの頂点集合を自動で入力するようにする)
-vector<bool> making_induced_subgraph(long long int induced_subgraph_n) {
+vector<bool> making_induced_subgraph(vector<long long int> Vertex_Subset) {
 	vector<bool> Exist;//誘導部分グラフを計算するのに用いる配列,頂点iが誘導部分グラフの頂点集合に属していたらexist[i]=true,属していなければexist[i]=falseである.
 	Exist.resize(n);
 	cout << "Existの大きさは" << Exist.size() << endl;
 	for (long long int i = 0; i < n; i++) {
 		Exist[i] = false;
 	}
-	for (long long int i = 0; i < induced_subgraph_n; i++) {
-		long long int a;
-		cout << i + 1 << "つ目の頂点を入力してください:" << endl;
-		cin >> a;
-		a--;
-		Exist[a] = true;
+	for (long long int i = 0; i < Vertex_Subset.size(); i++) {
+		Exist[i] = true;
 	}
 	Induced_subgraph.resize(n);
 	for (long long int i = 0; i < n; i++) {
