@@ -218,7 +218,7 @@ vector<bool> who_is_influenced_not_bit(vector<bool> Exist) {
 	return Influenced;
 }
 
-//|Y(X)|を求める関数
+//Y(X)を求める関数
 vector<bool> calculate_YX(vector<bool> Influenced, vector<bool> Exist) {
 	vector<bool> YX;//頂点iがY(X)に属するならYX[i]=1,属さないならYX[i]=0
 	YX.resize(n);
@@ -246,16 +246,29 @@ void sort_in_order_of_thresholds() {
 
 //重複組み合わせ列挙
 vector<long long int> A;
-void overlapping_combination(long long int s, long long int t) {
+bool overlapping_combination(long long int s, long long int t) {
 	if (s == nd && t == 0) {
-		for (long long int i = 0; i < A.size(); i++) {
-			cout << A[i] << " ";
+		vector<long long int> Vertex_Subset;
+		for (long long int i = 0; i < nd; i++) {
+			for (long long int j = 0; j < A[i]; i++) {
+				Vertex_Subset.push_back(Type_partitions[i][j]);
+			}
 		}
-		cout << endl;
-		return;
+		vector<bool> Exist;
+		Exist = making_induced_subgraph(Vertex_Subset);
+		vector<bool> Influenced;
+		Influenced = who_is_influenced_not_bit(Exist);
+		vector<bool> YX;
+		YX = calculate_YX(Influenced,Exist);
+		long long int count = 0;
+		for (long long int i = 0; i < n; i++) {
+			if (YX[i])count++;
+		}
+		if (count <= l)return true;
+		return false;
 	}
 	if (s == nd && t != 0) {
-		return;
+		return false;
 	}
 	for (long long int i = 0; i <= t; i++) {
 		A[s] = i;
@@ -265,8 +278,9 @@ void overlapping_combination(long long int s, long long int t) {
 
 //IIB_k(G,k,l)//G,k,lはグローバル変数で設定しているので,関数の引数に書いていない
 bool IIB_k() {
+	sort_in_order_of_thresholds();
 	for (long long int f = 1; f < k + 1; f++) {
-		
+		if (overlapping_combination(0, f))return true;
 	}
 	return false;
 }
@@ -359,9 +373,13 @@ int main() {
 	多項式確認終了*/
 
 	clock_t start = clock();    //時間測定開始
-
-	cin >> numbers_of_induced_subgraph_vertices;
-	making_induced_subgraph(numbers_of_induced_subgraph_vertices);//部分誘導グラフの作成
+	
+	if (IIB_k) {
+		cout << "YES" << endl;
+	}
+	else {
+		cout << "No" << endl;
+	}
 
 	clock_t end = clock();     // 時間測定終了
 	cout << "duration = " << (double)(end - start) / CLOCKS_PER_SEC << "sec.\n";
