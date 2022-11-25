@@ -27,7 +27,7 @@ long long int nd = -1;//グラフの近傍多様性の値を格納する変数
 long long int numbers_of_induced_subgraph_vertices;//誘導部分グラフの頂点数
 vector<vector<long long int>> Induced_subgraph;//誘導部分グラフ
 //定数終了
-//最終的に感染する頂点を求める関数
+//最終的に感染する頂点を求める関数(使っていない)
 long long int who_is_influenced(long long int bit) {
 	long long int influenced = 0;//感染している頂点をbit1で表す
 	for (long long int u = 0; u < n; u++) {
@@ -50,29 +50,39 @@ long long int who_is_influenced(long long int bit) {
 
 //Monomialsを求める
 void calculate_Monomials() {
+	cout << "calculate_Monomials開始" << endl;
 	long long int count = 1;
 	for (long long int i = 0; i < n; i++) {
+		cout <<"i="<<i << endl;
 		Monomials.push_back(count);
 		count = (count*x)%mod;
 	}
+	cout << "calculate_Monomials終了" << endl;
 }
 
 //polynominal hash function(それぞれの頂点の近傍に対するハッシュ値を求める)
 void polynominal_hash_fanction() {
+	cout << "polynominal_hash_function開始" << endl;
 	for (long long int i = 0; i < n; i++) {
+		cout <<"i="<<i << endl;
 		long long int sum = 0;
 		for (long long int j = 0; j < G[i].size(); j++) {
+			cout << "j=" << j << endl;
 			sum = (sum + Monomials[G[i][j]]) % mod;
 		}
 		Hash_table.push_back(sum);
 	}
+	cout << "polynominal_hash_function終了" << endl;
 }
 
 //近傍多様性を求める
-	void calculate_neighborhood_diversity() {
+void calculate_neighborhood_diversity() {
+	cout << "calculate_neighborhood_diversity開始" << endl;
 	long long int count = 0;//新しいタイプの頂点はtype_partition[count]に属する
 	for (long long int v = 0; v < n-1; v++) {
+		cout << "v=" << v << endl;
 		for (long long int u = v+1; u < n; u++) {
+			cout << "u=" << u << endl;
 			long long int one = Hash_table[u] - Monomials[v];//h(N(u)\v)
 			long long int the_other = Hash_table[v] - Monomials[u];//h(N(v)\u)
 			if (one < 0)one += mod;
@@ -89,56 +99,71 @@ void polynominal_hash_fanction() {
 		}
 	}
 	nd = count;//countの値は近傍多様性なので,ndにcountの値を格納する
+	//Place_of_verticesの確認
+	for (long long int i = 0; i < n; i++) {
+		cout << "Place_of_vertices[" << i << "]="<<Place_of_vertices[i] << endl;
+	}
 	//タイプパーティションの作成開始
 	Type_partitions.resize(count);
 	for (long long int i = 0; i < n; i++) {
+		cout << "i=" << i << endl;
 		Type_partitions[Place_of_vertices[i]].push_back(i);
 	}
 	//タイプパーティションの作成終了
 }
 //2つの頂点u,vの近傍を比較する関数(グラフの隣接リストが値の小さい順にsortしている前提で前から比較していく)
-	bool check_neighbor(long long int u, long long int v) {
-		long long int count_u = 0;//G[u]の何番目の頂点かを表す
-		long long int count_v = 0;//G[v]の何番目の頂点かを表す
-		while (1) {
-			if (count_u == G[u].size() && count_v == G[v].size())return true;//2つの頂点u,vの近傍に属する頂点が全て同じだったら,trueを返す
-			if (G[u][count_u] == v)count_u++;//uの近傍に属するvは飛ばす
-			if (G[v][count_v] == u)count_v++;//vの近傍に属するuは飛ばす
-			if (G[u][count_u] == G[v][count_v]) {
-				count_u++;
-				count_v++;
-			}
-			else {
-				return false;
-			}
+bool check_neighbor(long long int u, long long int v) {
+	cout << "check_neighbor開始" << endl;
+	long long int count_u = 0;//G[u]の何番目の頂点かを表す
+	long long int count_v = 0;//G[v]の何番目の頂点かを表す
+	while (1) {
+		if (count_u == G[u].size() && count_v == G[v].size())return true;//2つの頂点u,vの近傍に属する頂点が全て同じだったら,trueを返す
+		if (G[u][count_u] == v)count_u++;//uの近傍に属するvは飛ばす
+		if (G[v][count_v] == u)count_v++;//vの近傍に属するuは飛ばす
+		if (G[u][count_u] == G[v][count_v]) {
+			count_u++;
+			count_v++;
 		}
+		else {
+			return false;
+		}
+	}
+	cout << "check_neighbor終了" << endl;
 }
 
 //近傍多様性が合っているかどうか確認する
 bool check_neighborhood_diversity() {
+	cout << "check_neighborhood_diversity開始" << endl;
 	long long int representative = -1;//今調べたいタイプパーティションに属する代表点
 	long long int others = -1;//今調べたいタイプパーティションに属する代表点以外の頂点
 	//頂点representativeと頂点othersの近傍が一致しているかどうか確認する(グラフの隣接リストが値の小さい順にsortしている前提で前から比較していく)
 	for (long long int i = 0; i < Type_partitions.size(); i++) {
+		cout << "i=" << i << endl;
 		if (Type_partitions[i].size() == 1)continue;
 		representative = Type_partitions[i][0];//代表点が定まる
 		for (long long int j = 1; j < Type_partitions[i].size(); j++) {
+			cout << "j=" << j <<endl;
 			others = Type_partitions[i][j];//近傍を比較する頂点が定まる
 			//2つの頂点の近傍の比較を実際に行う
 			if (!check_neighbor(representative, others)) {//もし異なっていたら
+				cout << "異なっているぞ！" <<endl;
+				cout << "check_neighborhood_diversity終了" << endl;
 				return false;
 			}
 		}
 	}
+	cout << "check_neighborhood_diversity終了" << endl;
 	return true;
 }
 
 //近傍多様性を求めて,確認する,正しい近傍多様性が求まらなかったらxやaを変えて求め直す(近傍多様性に関する関数をまとめたもの)
 void summarize_neighbor_diversity() {
+	cout << "summarize_neighbor_diversity開始" << endl;
 	calculate_Monomials();
 	polynominal_hash_fanction();
 	calculate_neighborhood_diversity();
 	while (!check_neighborhood_diversity()) {//近傍多様性が正しくなかったら近傍多様性を求めなおす
+		cout << "近傍多様性が正しくないのだ！" << endl;
 		//変数を初期状態に戻す(Monomials,Hash_table,Place_of_vertices,Type_partitions,ndをcalculate_Monomialsを実行する前に戻す)開始
 		Monomials.clear();
 		Monomials.shrink_to_fit();
@@ -160,6 +185,7 @@ void summarize_neighbor_diversity() {
 		calculate_neighborhood_diversity();
 		//近傍多様性を求めなおす終了
 	}
+	cout << "summarize_neighbor_diversity終了" << endl;
 }
 
 //誘導部分グラフを計算する関数
@@ -248,6 +274,12 @@ void sort_in_order_of_thresholds() {
 vector<long long int> A;
 bool overlapping_combination(long long int s, long long int t) {
 	if (s == nd && t == 0) {
+		//デバック用開始
+		for (long long int i = 0; i < n; i++) {
+			cout << A[i] << " ";
+		}
+		cout << endl;
+		//デバック用終了
 		vector<long long int> Vertex_Subset;
 		for (long long int i = 0; i < nd; i++) {
 			for (long long int j = 0; j < A[i]; i++) {
@@ -374,6 +406,8 @@ int main() {
 
 	clock_t start = clock();    //時間測定開始
 	
+	summarize_neighbor_diversity();
+
 	if (IIB_k) {
 		cout << "YES" << endl;
 	}
