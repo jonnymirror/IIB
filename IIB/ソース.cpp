@@ -204,12 +204,11 @@ void summarize_neighbor_diversity() {
 vector<bool> making_induced_subgraph(vector<long long int> Vertex_Subset) {
 	vector<bool> Exist;//誘導部分グラフを計算するのに用いる配列,頂点iが誘導部分グラフの頂点集合に属していたらexist[i]=true,属していなければexist[i]=falseである.
 	Exist.resize(n);
-	cout << "Existの大きさは" << Exist.size() << endl;
 	for (long long int i = 0; i < n; i++) {
 		Exist[i] = false;
 	}
 	for (long long int i = 0; i < Vertex_Subset.size(); i++) {
-		Exist[i] = true;
+		Exist[Vertex_Subset[i]] = true;
 	}
 	Induced_subgraph.resize(n);
 	for (long long int i = 0; i < n; i++) {
@@ -277,17 +276,20 @@ vector<bool> calculate_YX(vector<bool> Influenced, vector<bool> Exist) {
 
 //IIB_kの前処理(Gのタイプパーティション{V_0,V_1,...,V_nd}のそれぞれのV_i={v_{i,1},...,v_{i,|V_i|}}の頂点を閾値の非減少順,例えば,t(v_{i,j})<=t(v_{i,j+1})),のように並べる)
 void sort_in_order_of_thresholds() {
+	cout << "sort_in_order_of_thresholds開始" << endl;
 	for (long long int i = 0; i < Type_partitions.size(); i++) {
 		sort(Type_partitions[i].begin(), Type_partitions[i].end());
 	}
+	cout << "sort_in_order_of_thresholds終了" <<endl;
 }
 
 //重複組み合わせ列挙
 vector<long long int> A;
 bool overlapping_combination(long long int s, long long int t) {
+	cout << "overlapping_combination 開始　s=" << s << " t=" << t << endl;
 	if (s == nd && t == 0) {
 		//デバック用開始
-		for (long long int i = 0; i < n; i++) {
+		for (long long int i = 0; i < nd; i++) {
 			cout << A[i] << " ";
 		}
 		cout << endl;
@@ -308,24 +310,61 @@ bool overlapping_combination(long long int s, long long int t) {
 		for (long long int i = 0; i < n; i++) {
 			if (YX[i])count++;
 		}
-		if (count <= l)return true;
+		//デバック開始
+		cout << "Vertex_Subset" << endl;
+		for (long long int i = 0; i < Vertex_Subset.size(); i++) {
+			cout << Vertex_Subset[i]+1 << " ";
+		}
+		cout << endl;
+		cout << "Exist" << endl;
+		for (long long int i = 0; i < n; i++) {
+			cout << Exist[i] << " ";
+		}
+		cout << endl;
+		cout << "Influenced" << endl;
+		for (long long int i = 0; i < n; i++) {
+			cout << Influenced[i] << " ";
+		}
+		cout << endl;
+		cout << "YX" << endl;
+		for (long long int i = 0; i < n; i++) {
+			cout << YX[i] << " ";
+		}
+		cout << endl;
+		cout << "count=" << count << endl;
+		cout << "l=" << l << endl;
+		cout << "k=" << k << endl;
+		//デバック終了
+		if (count <= l) {
+			cout << "trueです" << endl;
+			return true;
+		}
+		cout << "falseです.aaaaaaaaaa" << endl;
 		return false;
 	}
 	if (s == nd && t != 0) {
+		cout << "falseです.bbbbbbbbbb" << endl;
 		return false;
 	}
 	for (long long int i = 0; i <= t; i++) {
+		cout << "i=" << i << endl;
 		A[s] = i;
-		overlapping_combination(s + 1, t - i);
+		return overlapping_combination(s + 1, t - i);
 	}
 }
 
 //IIB_k(G,k,l)//G,k,lはグローバル変数で設定しているので,関数の引数に書いていない
 bool IIB_k() {
+	cout << "IIB_k開始" << endl;
 	sort_in_order_of_thresholds();
 	for (long long int f = 1; f < k + 1; f++) {
-		if (overlapping_combination(0, f))return true;
+		cout << "f=" << f << endl;
+		if (overlapping_combination(0, f)) {
+			cout << "trueでIIB_k終了" << endl;
+			return true;
+		}
 	}
+	cout << "falseでIIB_k終了" << endl;
 	return false;
 }
 
@@ -420,7 +459,9 @@ int main() {
 	
 	summarize_neighbor_diversity();
 
-	if (IIB_k) {
+	A.resize(n);
+
+	if (IIB_k()) {
 		cout << "YES" << endl;
 	}
 	else {
