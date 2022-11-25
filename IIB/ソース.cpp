@@ -79,9 +79,10 @@ void polynominal_hash_fanction() {
 void calculate_neighborhood_diversity() {
 	cout << "calculate_neighborhood_diversity開始" << endl;
 	long long int count = 0;//新しいタイプの頂点はtype_partition[count]に属する
-	for (long long int v = 0; v < n-1; v++) {
+	Place_of_vertices[0] = 0;
+	for (long long int v = 0; v < n; v++) {
 		cout << "v=" << v << endl;
-		for (long long int u = v+1; u < n; u++) {
+		for (long long int u = 0; u < n; u++) {
 			cout << "u=" << u << endl;
 			long long int one = Hash_table[u] - Monomials[v];//h(N(u)\v)
 			long long int the_other = Hash_table[v] - Monomials[u];//h(N(v)\u)
@@ -89,27 +90,38 @@ void calculate_neighborhood_diversity() {
 			if (the_other < 0)the_other += mod;
 			one = one % mod;
 			the_other = the_other % mod;
+			cout << "one=" << one << endl;
+			cout << "the_other=" << the_other << endl;
 			if (one == the_other) {//h(N(u)\v)==h(N(v)\u)の時
-				if (Place_of_vertices[u] == -1) {//頂点uがどのタイプパーティションにも属していない時
-					Place_of_vertices[u] = count;
-					count++;
+				cout << "Place_of_vertices[" << v << "]=" << Place_of_vertices[v]<<endl;
+				cout << "Place_of_vertices[" << u << "]=" << Place_of_vertices[u]<<endl;
+				if(Place_of_vertices[u]!=-1){
+					Place_of_vertices[v] = Place_of_vertices[u];//vはuと同じタイプパーティションに属する
 				}
-				Place_of_vertices[v] = Place_of_vertices[u];//vはuと同じタイプパーティションに属する
+				cout << "changed!" << endl;
+				cout << "Place_of_vertices[" << v << "]=" << Place_of_vertices[v] << endl;
+				cout << "Place_of_vertices[" << u << "]=" << Place_of_vertices[u] << endl;
 			}
 		}
+		if (Place_of_vertices[v] == -1) {//頂点vがどのタイプパーティションにも属していない時
+			count++;
+			cout << "count=" << count << endl;
+			Place_of_vertices[v] = count;
+		}
 	}
-	nd = count;//countの値は近傍多様性なので,ndにcountの値を格納する
+	nd = count+1;//countの値は近傍多様性なので,ndにcountの値を格納する
 	//Place_of_verticesの確認
 	for (long long int i = 0; i < n; i++) {
 		cout << "Place_of_vertices[" << i << "]="<<Place_of_vertices[i] << endl;
 	}
 	//タイプパーティションの作成開始
-	Type_partitions.resize(count);
+	Type_partitions.resize(nd);
 	for (long long int i = 0; i < n; i++) {
 		cout << "i=" << i << endl;
 		Type_partitions[Place_of_vertices[i]].push_back(i);
 	}
 	//タイプパーティションの作成終了
+	cout << "calculate_neighborhood_diversity終了" << endl;
 }
 //2つの頂点u,vの近傍を比較する関数(グラフの隣接リストが値の小さい順にsortしている前提で前から比較していく)
 bool check_neighbor(long long int u, long long int v) {
